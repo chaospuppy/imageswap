@@ -17,10 +17,14 @@ package cmd
 
 import (
 	// "fmt"
+	"context"
 	"github.com/spf13/cobra"
-	"imageswap/server"
+	server "imageswap/server"
 	"k8s.io/klog/v2"
+	"os"
+	"os/signal"
 	"regexp"
+	"syscall"
 )
 
 var ecrHostname string
@@ -42,12 +46,24 @@ var rootCmd = &cobra.Command{
 			klog.Fatalf("%s is not a valid ECR repository URL", args[0])
 		}
 
-		server := server.RunServer(httpPort)
+		server := server.NewHTTPServer(httpPort)
 		go func() {
 			if err := server.ListenAndServe(); err != nil {
 				klog.Errorf("Failed to listen and serve: %v", err)
 			}
 		}()
+
+		klog.Infof("Server listening on port: %v", httpPort)
+
+		// listen shutdown signal
+		signalChan := make(chan os.Signal, 1)
+		signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+		<-signalChan
+
+		klog.Infof("Shutdown gracefully...")
+		if err := server.Shutdown(context.Background()); err != nil {
+			klog.Error(err)
+		}
 	},
 }
 
