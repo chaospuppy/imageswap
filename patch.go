@@ -1,4 +1,4 @@
-package ironbankimageswapwebhook
+package imageswap
 
 const (
 	addOperation     = "add"

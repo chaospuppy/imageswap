@@ -2,20 +2,20 @@ package kinds
 
 import (
 	"encoding/json"
-	"ironbankimageswapwebhook"
+	"imageswap"
 	v1 "k8s.io/api/core/v1"
 )
 
 // NewValidationHook creates a new instance of pods validation hook
-func NewValidationHook() ironbankimageswapwebhook.Hook {
-	return ironbankimageswapwebhook.Hook{
+func NewValidationHook() imageswap.Hook {
+	return imageswap.Hook{
 		Create: validateCreate(),
 	}
 }
 
 // NewMutationHook creates a new instance of pods mutation hook
-func NewMutationHook() ironbankimageswapwebhook.Hook {
-	return ironbankimageswapwebhook.Hook{
+func NewMutationHook() imageswap.Hook {
+	return imageswap.Hook{
 		Create: mutateCreate(),
 	}
 }

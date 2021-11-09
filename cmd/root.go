@@ -18,7 +18,7 @@ package cmd
 import (
 	// "fmt"
 	"github.com/spf13/cobra"
-	"ironbankimageswapwebhook/server"
+	"imageswap/server"
 	"k8s.io/klog/v2"
 	"regexp"
 )

@@ -1,4 +1,4 @@
-module ironbankimageswapwebhook
+module imageswap
 
 go 1.17
 
