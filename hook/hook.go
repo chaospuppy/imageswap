@@ -1,4 +1,4 @@
-package imageswap
+package hook
 
 import (
 	"fmt"

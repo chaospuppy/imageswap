@@ -2,20 +2,20 @@ package pods
 
 import (
 	"encoding/json"
-	"imageswap"
+	"imageswap/hook"
 	v1 "k8s.io/api/core/v1"
 )
 
 // NewValidationHook creates a new instance of pods validation hook
-func NewValidationHook() imageswap.Hook {
-	return imageswap.Hook{
+func NewValidationHook() hook.Hook {
+	return hook.Hook{
 		Create: validateCreate(),
 	}
 }
 
 // NewMutationHook creates a new instance of pods mutation hook
-func NewMutationHook() imageswap.Hook {
-	return imageswap.Hook{
+func NewMutationHook() hook.Hook {
+	return hook.Hook{
 		Create: mutateCreate(),
 	}
 }

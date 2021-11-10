@@ -1,4 +1,4 @@
-package imageswap
+package hook
 
 const (
 	addOperation     = "add"
