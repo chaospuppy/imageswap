@@ -7,7 +7,11 @@ import (
 
 	"k8s.io/api/admission/v1beta1"
 	v1 "k8s.io/api/core/v1"
+	"regexp"
 )
+
+var ecrPattern = regexp.MustCompile(`^(\d{12})\.dkr\.ecr(\-fips)?\.([a-zA-Z0-9][a-zA-Z0-9-_]*)\.(amazonaws\.com(\.cn)?|sc2s\.sgov\.gov|c2s\.ic\.gov)$`)
+var registryPattern = regexp.MustCompile(``)
 
 func validateCreate() imageswap.AdmitFunc {
 	return func(r *v1beta1.AdmissionRequest) (*imageswap.Result, error) {
@@ -34,17 +38,17 @@ func mutateCreate() imageswap.AdmitFunc {
 			return &imageswap.Result{Msg: err.Error()}, nil
 		}
 
-		// Very simple logic to inject a new "sidecar" container.
-		if ironbank := pod.Labels["ironbank"]; ironbank == "imageswap" {
-			var containers []v1.Container
-			containers = append(containers, pod.Spec.Containers...)
-			sideC := v1.Container{
-				Name:    "test-sidecar",
-				Image:   "busybox:stable",
-				Command: []string{"sh", "-c", "while true; do echo 'I am a container injected by mutating webhook'; sleep 2; done"},
+		for _, c := range pod.Spec.Containers {
+			err = checkForRegistry(c.Image)
+			if err != nil {
+
 			}
-			containers = append(containers, sideC)
-			operations = append(operations, imageswap.ReplacePatchOperation("/spec/containers", containers))
+			operations = append(operations, imageswap.ReplacePatchOperation("/spec/containers/image", c))
+		}
+		sideC := v1.Container{
+			Name:    "test-sidecar",
+			Image:   "busybox:stable",
+			Command: []string{"sh", "-c", "while true; do echo 'I am a container injected by mutating webhook'; sleep 2; done"},
 		}
 
 		// Add a simple annotation using `AddPatchOperation`
@@ -55,4 +59,9 @@ func mutateCreate() imageswap.AdmitFunc {
 			PatchOps: operations,
 		}, nil
 	}
+}
+
+func checkForRegistry(image string) error {
+	registry := strings.Split(image, "/")[0]
+
 }

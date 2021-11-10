@@ -1,0 +1,6 @@
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - nginxconfigmap.yaml
+  - deployment.yaml
+  - service.yaml
