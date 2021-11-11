@@ -15,7 +15,10 @@ limitations under the License.
 */
 package imageswap
 
-import "imageswap/cmd"
+import (
+	"fmt"
+	"imageswap/cmd"
+)
 
 func main() {
 	cmd.Execute()

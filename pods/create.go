@@ -7,7 +7,6 @@ import (
 	"imageswap/util"
 
 	"k8s.io/api/admission/v1beta1"
-	v1 "k8s.io/api/core/v1"
 	"regexp"
 )
 
@@ -40,16 +39,16 @@ func mutateCreate() hook.AdmitFunc {
 		}
 
 		for _, c := range pod.Spec.Containers {
-			registry := strings.Split(c.Image, "/")[0]
-			util.CheckForRegistry(registry)
-			operations = append(operations, hook.ReplacePatchOperation("/spec/containers/image", c))
+			splitImage := strings.Split(c.Image, "/")
+			registry := splitImage[0]
+			imagePath := splitImage[1:]
+			if util.CheckForRegistry(registry) {
+				// Replace existing registry with ecr registry
+				operations = append(operations, hook.ReplacePatchOperation("/spec/containers/image", EcrHostname+imagePath))
+			} else {
+				operations = append(operations, hook.ReplacePatchOperation("/spec/containers/image", EcrHostname+c.Image))
+			}
 		}
-		sideC := v1.Container{
-			Name:    "test-sidecar",
-			Image:   "busybox:stable",
-			Command: []string{"sh", "-c", "while true; do echo 'I am a container injected by mutating webhook'; sleep 2; done"},
-		}
-
 		// Add a simple annotation using `AddPatchOperation`
 		metadata := map[string]string{"origin": "fromMutation"}
 		operations = append(operations, hook.AddPatchOperation("/metadata/annotations", metadata))

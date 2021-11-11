@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	// "fmt"
 	"context"
 	"github.com/spf13/cobra"
 	server "imageswap/server"
@@ -27,7 +26,7 @@ import (
 	"syscall"
 )
 
-var ecrHostname string
+var EcrHostname string
 var httpPort string
 var ecrPattern = regexp.MustCompile(`^(\d{12})\.dkr\.ecr(\-fips)?\.([a-zA-Z0-9][a-zA-Z0-9-_]*)\.(amazonaws\.com(\.cn)?|sc2s\.sgov\.gov|c2s\.ic\.gov)$`)
 
@@ -45,7 +44,7 @@ var rootCmd = &cobra.Command{
 		if len(splitURL) < 4 {
 			klog.Fatalf("%s is not a valid ECR repository URL", args[0])
 		}
-
+		EcrHostname = args[0]
 		server := server.NewHTTPServer(httpPort)
 		go func() {
 			if err := server.ListenAndServe(); err != nil {

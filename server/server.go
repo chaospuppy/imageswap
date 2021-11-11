@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"imageswap/pods"
 	"net/http"
 )
@@ -11,11 +12,11 @@ func NewHTTPServer(port string) *http.Server {
 	podsValidation := pods.NewValidationHook()
 	podsMutation := pods.NewMutationHook()
 
+	ah := newAdmissionHandler()
 	mux := http.NewServeMux()
 	mux.Handle("/healthz", healthz())
 	mux.Handle("/validate/pods", ah.Serve(podsValidation))
 	mux.Handle("/mutate/pods", ah.Serve(podsMutation))
-	mux := http.NewServeMux()
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),
 		Handler: mux,
