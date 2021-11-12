@@ -6,11 +6,18 @@ import (
 	"net/http"
 )
 
-func NewHTTPServer(port string) *http.Server {
+func RunHTTPServer(server *http.Server, tlsKey string, tlsCert string) error {
+	if err := server.ListenAndServeTLS(tlsCert, tlsKey); err != nil {
+		return err
+	}
+	return nil
+}
+
+func NewHTTPServer(port string, ecrHostname string) *http.Server {
 
 	// Instances hooks
 	podsValidation := pods.NewValidationHook()
-	podsMutation := pods.NewMutationHook()
+	podsMutation := pods.NewMutationHook(ecrHostname)
 
 	ah := newAdmissionHandler()
 	mux := http.NewServeMux()

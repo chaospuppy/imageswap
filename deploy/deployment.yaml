@@ -1,41 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sidecar-injector-webhook-deployment
-  namespace: sidecar-injector
+  name: imageswap-webhook-deployment
+  namespace: imageswap
   labels:
-    app: sidecar-injector
+    app: imageswap
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: sidecar-injector
+      app: imageswap
   template:
     metadata:
       labels:
-        app: sidecar-injector
+        app: imageswap
     spec:
       containers:
-        - name: sidecar-injector
-          image: localhost:5000/morvencao/sidecar-injector:latest
-          imagePullPolicy: IfNotPresent
+        - name: imageswap
+          image: localhost:5000/imageswap:latest
+          imagePullPolicy: Always
           args:
-          - -sidecarCfgFile=/etc/webhook/config/sidecarconfig.yaml
-          - -tlsCertFile=/etc/webhook/certs/cert.pem
-          - -tlsKeyFile=/etc/webhook/certs/key.pem
-          - -alsologtostderr
-          - -v=4
-          - 2>&1
+            - "/imageswap"
+            - "$(ECR_HOSTNAME)"
+            # - --tls-cert-file=/etc/webhook/certs/cert.pem
+            # - --tls-cert-key=/etc/webhook/certs/key.pem
           volumeMounts:
           - name: webhook-certs
             mountPath: /etc/webhook/certs
             readOnly: true
-          - name: webhook-config
-            mountPath: /etc/webhook/config
+          env:
+          - name: ECR_HOSTNAME
+            valueFrom:
+              configMapKeyRef:
+                name: imageswap-configuration
+                key: ECR_HOSTNAME
       volumes:
       - name: webhook-certs
         secret:
-          secretName: sidecar-injector-webhook-certs
-      - name: webhook-config
-        configMap:
-          name: sidecar-injector-webhook-configmap
+          secretName: imageswap-webhook-certs

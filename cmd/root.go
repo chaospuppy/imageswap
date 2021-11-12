@@ -18,7 +18,7 @@ package cmd
 import (
 	"context"
 	"github.com/spf13/cobra"
-	server "imageswap/server"
+	"imageswap/server"
 	"k8s.io/klog/v2"
 	"os"
 	"os/signal"
@@ -26,9 +26,11 @@ import (
 	"syscall"
 )
 
-var EcrHostname string
-var httpPort string
-var ecrPattern = regexp.MustCompile(`^(\d{12})\.dkr\.ecr(\-fips)?\.([a-zA-Z0-9][a-zA-Z0-9-_]*)\.(amazonaws\.com(\.cn)?|sc2s\.sgov\.gov|c2s\.ic\.gov)$`)
+var (
+	tlsKey, tlsCert, httpPort string
+	insecure                  bool
+	ecrPattern                = regexp.MustCompile(`^(\d{12})\.dkr\.ecr(\-fips)?\.([a-zA-Z0-9][a-zA-Z0-9-_]*)\.(amazonaws\.com(\.cn)?|sc2s\.sgov\.gov|c2s\.ic\.gov)$`)
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -44,14 +46,13 @@ var rootCmd = &cobra.Command{
 		if len(splitURL) < 4 {
 			klog.Fatalf("%s is not a valid ECR repository URL", args[0])
 		}
-		EcrHostname = args[0]
-		server := server.NewHTTPServer(httpPort)
+		ecrHostname := args[0]
+		svr := server.NewHTTPServer(httpPort, ecrHostname)
 		go func() {
-			if err := server.ListenAndServe(); err != nil {
+			if err := server.RunHTTPServer(svr, tlsKey, tlsCert); err != nil {
 				klog.Errorf("Failed to listen and serve: %v", err)
 			}
 		}()
-
 		klog.Infof("Server listening on port: %v", httpPort)
 
 		// listen shutdown signal
@@ -60,9 +61,10 @@ var rootCmd = &cobra.Command{
 		<-signalChan
 
 		klog.Infof("Shutdown gracefully...")
-		if err := server.Shutdown(context.Background()); err != nil {
+		if err := svr.Shutdown(context.Background()); err != nil {
 			klog.Error(err)
 		}
+
 	},
 }
 
@@ -73,5 +75,8 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.PersistentFlags().BoolVar(&insecure, "--insecure", false, "TODO: Does nothing")
 	rootCmd.PersistentFlags().StringVar(&httpPort, "httpPort", "8443", "The port the webhook HTTP Server with listen on.  Defaults to 8443")
+	rootCmd.PersistentFlags().StringVar(&tlsKey, "tls-key-file", "/etc/webhook/certs/key.pem", "Path to TLS key")
+	rootCmd.PersistentFlags().StringVar(&tlsCert, "tls-cert-file", "/etc/webhook/certs/cert.pem", "Path to TLS certificate")
 }

@@ -30,7 +30,7 @@ func validateCreate() hook.AdmitFunc {
 	}
 }
 
-func mutateCreate() hook.AdmitFunc {
+func mutateCreate(ecrHostname string) hook.AdmitFunc {
 	return func(r *v1beta1.AdmissionRequest) (*hook.Result, error) {
 		var operations []hook.PatchOperation
 		pod, err := parsePod(r.Object.Raw)
@@ -44,9 +44,9 @@ func mutateCreate() hook.AdmitFunc {
 			imagePath := splitImage[1:]
 			if util.CheckForRegistry(registry) {
 				// Replace existing registry with ecr registry
-				operations = append(operations, hook.ReplacePatchOperation("/spec/containers/image", EcrHostname+imagePath))
+				operations = append(operations, hook.ReplacePatchOperation("/spec/containers/image", ecrHostname+strings.Join(imagePath[:], ",")))
 			} else {
-				operations = append(operations, hook.ReplacePatchOperation("/spec/containers/image", EcrHostname+c.Image))
+				operations = append(operations, hook.ReplacePatchOperation("/spec/containers/image", ecrHostname+c.Image))
 			}
 		}
 		// Add a simple annotation using `AddPatchOperation`

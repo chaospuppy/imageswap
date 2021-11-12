@@ -1,20 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: sidecar-injector-webhook-configmap
-  namespace: sidecar-injector
+  name: imageswap-configuration
+  namespace: imageswap
 data:
-  sidecarconfig.yaml: |
-    containers:
-    - name: sidecar-nginx
-      image: nginx:1.12.2
-      imagePullPolicy: IfNotPresent
-      ports:
-      - containerPort: 80
-      volumeMounts:
-      - name: nginx-conf
-        mountPath: /etc/nginx
-    volumes:
-    - name: nginx-conf
-      configMap:
-        name: nginx-configmap
+  ECR_HOSTNAME: "550496719187.dkr.ecr.us-west-1.amazonaws.com"
