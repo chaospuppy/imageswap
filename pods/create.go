@@ -1,12 +1,14 @@
 package pods
 
 import (
+	"fmt"
 	"strings"
 
 	"imageswap/hook"
 	"imageswap/util"
 
-	"k8s.io/api/admission/v1beta1"
+	"k8s.io/api/admission/v1"
+	"k8s.io/klog/v2"
 	"regexp"
 )
 
@@ -14,7 +16,7 @@ var ecrPattern = regexp.MustCompile(`^(\d{12})\.dkr\.ecr(\-fips)?\.([a-zA-Z0-9][
 var registryPattern = regexp.MustCompile(``)
 
 func validateCreate() hook.AdmitFunc {
-	return func(r *v1beta1.AdmissionRequest) (*hook.Result, error) {
+	return func(r *v1.AdmissionRequest) (*hook.Result, error) {
 		pod, err := parsePod(r.Object.Raw)
 		if err != nil {
 			return &hook.Result{Msg: err.Error()}, nil
@@ -31,22 +33,24 @@ func validateCreate() hook.AdmitFunc {
 }
 
 func mutateCreate(ecrHostname string) hook.AdmitFunc {
-	return func(r *v1beta1.AdmissionRequest) (*hook.Result, error) {
+	return func(r *v1.AdmissionRequest) (*hook.Result, error) {
 		var operations []hook.PatchOperation
 		pod, err := parsePod(r.Object.Raw)
 		if err != nil {
 			return &hook.Result{Msg: err.Error()}, nil
 		}
 
-		for _, c := range pod.Spec.Containers {
+		for i, c := range pod.Spec.Containers {
+			klog.Infof("%d", i)
+			klog.Infof("We have containers!")
 			splitImage := strings.Split(c.Image, "/")
 			registry := splitImage[0]
 			imagePath := splitImage[1:]
 			if util.CheckForRegistry(registry) {
 				// Replace existing registry with ecr registry
-				operations = append(operations, hook.ReplacePatchOperation("/spec/containers/image", ecrHostname+strings.Join(imagePath[:], ",")))
+				operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/containers/%d/image", i), ecrHostname+"/"+strings.Join(imagePath[:], ",")))
 			} else {
-				operations = append(operations, hook.ReplacePatchOperation("/spec/containers/image", ecrHostname+c.Image))
+				operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/containers/%d/image", i), ecrHostname+"/"+c.Image))
 			}
 		}
 		// Add a simple annotation using `AddPatchOperation`

@@ -46,7 +46,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-[ -z "${service}" ] && service=imageswap-webhook-svc
+[ -z "${service}" ] && service=imageswap
 [ -z "${secret}" ] && secret=imageswap-webhook-certs
 [ -z "${namespace}" ] && namespace=imageswap
 

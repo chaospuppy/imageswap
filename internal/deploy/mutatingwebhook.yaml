@@ -10,7 +10,7 @@ webhooks:
     service:
       name: imageswap
       namespace: imageswap
-      path: "/mutate"
+      path: "/mutate/pods"
     caBundle: ${CA_BUNDLE}
   rules:
   - operations: ["CREATE"]
@@ -18,5 +18,5 @@ webhooks:
     apiVersions: ["v1"]
     resources: ["pods"]
   sideEffects: None
-  admissionReviewVersions: ["v1", "v1beta1"]
+  admissionReviewVersions: ["v1"]
   timeoutSeconds: 15
