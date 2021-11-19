@@ -1,5 +1,7 @@
 #!/bin/bash
-
+######
+# NOTICE: This script has been modified from it's original form, which can be found here: https://github.com/morvencao/kube-mutating-webhook-tutorial/blob/master/deploy/webhook-patch-ca-bundle.sh
+######
 set -o errexit
 set -o nounset
 set -o pipefail

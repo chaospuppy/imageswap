@@ -1,4 +1,7 @@
 #!/bin/bash
+#######
+# NOTICE: this script has been modified from its original state, which can be found here: https://github.com/morvencao/kube-mutating-webhook-tutorial/blob/master/deploy/webhook-created-cert.sh
+#######
 
 set -e
 

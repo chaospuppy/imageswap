@@ -1,3 +1,4 @@
+//Package pods has been modified from its original state, which can be found here: https://github.com/douglasmakey/admissioncontroller/blob/master/pods/
 package pods
 
 import (
@@ -5,15 +6,13 @@ import (
 	"strings"
 
 	"imageswap/hook"
-	"imageswap/util"
 
+	_ "crypto/sha256" //Needed in the event the container image contains a digest
+	"github.com/docker/distribution/reference"
 	"k8s.io/api/admission/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
-	"regexp"
 )
-
-var ecrPattern = regexp.MustCompile(`^(\d{12})\.dkr\.ecr(\-fips)?\.([a-zA-Z0-9][a-zA-Z0-9-_]*)\.(amazonaws\.com(\.cn)?|sc2s\.sgov\.gov|c2s\.ic\.gov)$`)
-var registryPattern = regexp.MustCompile(``)
 
 func validateCreate() hook.AdmitFunc {
 	return func(r *v1.AdmissionRequest) (*hook.Result, error) {
@@ -40,25 +39,27 @@ func mutateCreate(ecrHostname string) hook.AdmitFunc {
 			return &hook.Result{Msg: err.Error()}, nil
 		}
 
-		for i, c := range pod.Spec.Containers {
-			klog.Infof("%d", i)
-			klog.Infof("We have containers!")
-			splitImage := strings.Split(c.Image, "/")
-			registry := splitImage[0]
-			imagePath := splitImage[1:]
-			if util.CheckForRegistry(registry) {
-				// Replace existing registry with ecr registry
-				operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/containers/%d/image", i), ecrHostname+"/"+strings.Join(imagePath[:], ",")))
-			} else {
-				operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/containers/%d/image", i), ecrHostname+"/"+c.Image))
-			}
-		}
-		// Add a simple annotation using `AddPatchOperation`
-		metadata := map[string]string{"origin": "fromMutation"}
-		operations = append(operations, hook.AddPatchOperation("/metadata/annotations", metadata))
+		operations = append(createPatchOperations(pod.Spec.Containers, operations, ecrHostname, "containers"))
+		operations = append(createPatchOperations(pod.Spec.InitContainers, operations, ecrHostname, "initContainers"))
 		return &hook.Result{
 			Allowed:  true,
 			PatchOps: operations,
 		}, nil
 	}
+}
+
+//createPatchOperations ingests a list of core/v1 Containers and replaces their existing images with images whose hostnames are set to the provided ecrHostname
+func createPatchOperations(containers []corev1.Container, operations []hook.PatchOperation, ecrHostname string, containerPath string) []hook.PatchOperation {
+	for i, container := range containers {
+		// originalImage := reflect.ValueOf(container.Image)
+		named, err := reference.ParseNormalizedNamed(container.Image)
+		if err != nil {
+			klog.Fatal(err)
+		}
+		// Append ecr registry hostname to image path, omit original registry hostname
+		operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/%s/%d/image", containerPath, i), ecrHostname+"/"+reference.Path(named)))
+		// Add annotations indicating original image value
+		operations = append(operations, hook.AddPatchOperation(fmt.Sprintf("/metadata/annotations/imageswap.ironbank.dso.mil~1%sOriginalImage", container.Name), container.Image))
+	}
+	return operations
 }

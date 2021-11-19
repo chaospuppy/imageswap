@@ -1,3 +1,4 @@
+//Package server has been renamed and modified from its original state, which can be found here: https://github.com/douglasmakey/admissioncontroller/blob/master/http/
 package server
 
 import (

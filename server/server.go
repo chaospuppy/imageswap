@@ -1,3 +1,4 @@
+//Package server has been renamed and modified from its original state, which can be found here: https://github.com/douglasmakey/admissioncontroller/blob/master/http/
 package server
 
 import (
@@ -6,6 +7,7 @@ import (
 	"net/http"
 )
 
+// RunHTTPServer runs a new instance of an http.Server over TLS using the provided paths to the TLS cert and key files
 func RunHTTPServer(server *http.Server, tlsKey string, tlsCert string) error {
 	if err := server.ListenAndServeTLS(tlsCert, tlsKey); err != nil {
 		return err
@@ -13,6 +15,7 @@ func RunHTTPServer(server *http.Server, tlsKey string, tlsCert string) error {
 	return nil
 }
 
+// NewHTTPServer returns a new instance of the *http.Server used to serve the imageswap webhook endpoints
 func NewHTTPServer(port string, ecrHostname string) *http.Server {
 
 	// Instances hooks

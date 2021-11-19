@@ -27,25 +27,3 @@ webhooks:
   admissionReviewVersions: ["v1"]
   reinvocationPolicy: Never
   timeoutSeconds: 15
-- name: rev.imageswap.ironbank.dso.mil
-  clientConfig:
-    service:
-      name: imageswap
-      namespace: imageswap
-      path: "/mutate/pods"
-    caBundle: ${CA_BUNDLE}
-  rules:
-  - operations: ["CREATE"]
-    apiGroups: [""]
-    apiVersions: ["v1"]
-    resources: ["pods"]
-  sideEffects: None
-  objectSelector:
-    matchExpressions:
-      - key: imageswap.ironbank.dso.mil
-        operator: NotIn
-        values:
-          - "disabled"
-  admissionReviewVersions: ["v1", "v1beta1"]
-  reinvocationPolicy: Never
-  timeoutSeconds: 15
