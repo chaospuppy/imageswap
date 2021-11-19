@@ -26,7 +26,7 @@ func NewHTTPServer(port string, ecrHostname string) *http.Server {
 	mux := http.NewServeMux()
 	mux.Handle("/healthz", healthz())
 	mux.Handle("/validate/pods", ah.Serve(podsValidation))
-	mux.Handle("/mutate/pods", ah.Serve(podsMutation))
+	mux.Handle("/mutate", ah.Serve(podsMutation))
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),
 		Handler: mux,

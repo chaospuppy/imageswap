@@ -10,7 +10,7 @@ webhooks:
     service:
       name: imageswap
       namespace: imageswap
-      path: "/mutate/pods"
+      path: "/mutate"
     caBundle: ${CA_BUNDLE}
   rules:
   - operations: ["CREATE"]
@@ -18,6 +18,12 @@ webhooks:
     apiVersions: ["v1"]
     resources: ["pods"]
   sideEffects: None
+  objectSelector:
+    matchExpressions:
+      - key: imageswap.ironbank.dso.mil
+        values:
+          - "disabled"
+        operator: NotIn
   namespaceSelector:
     matchExpressions:
       - key: imageswap.ironbank.dso.mil
