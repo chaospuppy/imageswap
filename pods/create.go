@@ -51,13 +51,22 @@ func mutateCreate(ecrHostname string) hook.AdmitFunc {
 //createPatchOperations ingests a list of core/v1 Containers and replaces their existing images with images whose hostnames are set to the provided ecrHostname
 func createPatchOperations(containers []corev1.Container, operations []hook.PatchOperation, ecrHostname string, containerPath string) []hook.PatchOperation {
 	for i, container := range containers {
-		// originalImage := reflect.ValueOf(container.Image)
 		named, err := reference.ParseNormalizedNamed(container.Image)
 		if err != nil {
 			klog.Fatal(err)
 		}
-		// Append ecr registry hostname to image path, omit original registry hostname
-		operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/%s/%d/image", containerPath, i), ecrHostname+"/"+reference.Path(named)))
+		// Ensure latest tag is appended if tag/digest was left blank
+		named = reference.TagNameOnly(named)
+		// Check for Tag
+		if tagged, ok := named.(reference.Tagged); ok {
+			operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/%s/%d/image", containerPath, i), ecrHostname+"/"+reference.Path(named)+":"+tagged.Tag()))
+			// Check for Digest
+		} else if digested, ok := named.(reference.Digested); ok {
+			operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/%s/%d/image", containerPath, i), ecrHostname+"/"+reference.Path(named)+"@"+digested.Digest().String()))
+			// Fail
+		} else {
+			klog.Fatalf("Invalid tag/digest format: %s", container.Image)
+		}
 		// Add annotations indicating original image value
 		operations = append(operations, hook.AddPatchOperation(fmt.Sprintf("/metadata/annotations/imageswap.ironbank.dso.mil~1%sOriginalImage", container.Name), container.Image))
 	}

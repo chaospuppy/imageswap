@@ -4,4 +4,4 @@ metadata:
   name: imageswap-configuration
   namespace: imageswap
 data:
-  ECR_HOSTNAME: "550496719187.dkr.ecr.us-west-1.amazonaws.com"
+  ECR_HOSTNAME: "341294496617.dkr.ecr.us-gov-west-1.amazonaws.com"
