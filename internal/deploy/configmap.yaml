@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: imageswap-configuration
+  namespace: imageswap
+data:
+  ECR_HOSTNAME: "341294496617.dkr.ecr.us-gov-west-1.amazonaws.com"
