@@ -6,9 +6,6 @@
   <ol>
     <li>
       <a href="#about-the-project">About Imagswap</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
     </li>
     <li>
       <a href="#getting-started">Getting Started</a>
@@ -30,27 +27,8 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `chaospuppy`, `imageswap`, `twitter_handle`, `linkedin_username`, `seagrentime`, `gmail`, `project_title`, `project_description`
-
 Imageswap is a simple program written in Go that is used to perform image registry hostname transformations as a Kubernetes [mutating webook](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#mutatingadmissionwebhook).
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-### Built With
-
-* [Next.js](https://nextjs.org/)
-* [React.js](https://reactjs.org/)
-* [Vue.js](https://vuejs.org/)
-* [Angular](https://angular.io/)
-* [Svelte](https://svelte.dev/)
-* [Laravel](https://laravel.com)
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -59,12 +37,9 @@ This is an example of how you may give instructions on setting up your project l
 To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
-
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+- Go 1.17.1
+- Docker
+- KinD
 
 ### Installation
 To compile only the `imageswap` binary:
@@ -91,8 +66,6 @@ Please see `Makefile` and `internal/deploy/` for materials used to test the webh
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
 <!-- ROADMAP -->
 ## Roadmap
 All dates are TBD, this project is passively developed
@@ -111,8 +84,6 @@ All dates are TBD, this project is passively developed
 See the [open issues](https://github.com/chaospuppy/imageswap/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- CONTRIBUTING -->
 ## Contributing
