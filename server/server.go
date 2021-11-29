@@ -16,11 +16,11 @@ func RunHTTPServer(server *http.Server, tlsKey string, tlsCert string) error {
 }
 
 // NewHTTPServer returns a new instance of the *http.Server used to serve the imageswap webhook endpoints
-func NewHTTPServer(port string, ecrHostname string) *http.Server {
+func NewHTTPServer(port string, hostname string) *http.Server {
 
 	// Instances hooks
 	podsValidation := pods.NewValidationHook()
-	podsMutation := pods.NewMutationHook(ecrHostname)
+	podsMutation := pods.NewMutationHook(hostname)
 
 	ah := newAdmissionHandler()
 	mux := http.NewServeMux()

@@ -22,14 +22,12 @@ import (
 	"k8s.io/klog/v2"
 	"os"
 	"os/signal"
-	"regexp"
 	"syscall"
 )
 
 var (
 	tlsKey, tlsCert, httpPort string
 	insecure                  bool
-	ecrPattern                = regexp.MustCompile(`^(\d{12})\.dkr\.ecr(\-fips)?\.([a-zA-Z0-9][a-zA-Z0-9-_]*)\.(amazonaws\.com(\.cn)?|sc2s\.sgov\.gov|c2s\.ic\.gov)$`)
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -37,17 +35,13 @@ var rootCmd = &cobra.Command{
 	Use:   "imageswap",
 	Short: "",
 	Long: `A binary used as part of a webhook to replace the existing hostname of a Pod
-	image: field with the desired ecr hostname.`,
+	image: field with the desired registry hostname.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
-			klog.Fatalf("Missing requred ECR hostname positional argument")
+			klog.Fatalf("Missing requred hostname positional argument")
 		}
-		splitURL := ecrPattern.FindStringSubmatch(args[0])
-		if len(splitURL) < 4 {
-			klog.Fatalf("%s is not a valid ECR repository URL", args[0])
-		}
-		ecrHostname := args[0]
-		svr := server.NewHTTPServer(httpPort, ecrHostname)
+		hostname := args[0]
+		svr := server.NewHTTPServer(httpPort, hostname)
 		go func() {
 			if err := server.RunHTTPServer(svr, tlsKey, tlsCert); err != nil {
 				klog.Errorf("Failed to listen and serve: %v", err)
