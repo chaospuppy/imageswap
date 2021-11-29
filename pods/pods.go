@@ -15,9 +15,9 @@ func NewValidationHook() hook.Hook {
 }
 
 // NewMutationHook creates a new instance of pods mutation hook
-func NewMutationHook(ecrHostname string) hook.Hook {
+func NewMutationHook(hostname string) hook.Hook {
 	return hook.Hook{
-		Create: mutateCreate(ecrHostname),
+		Create: mutateCreate(hostname),
 	}
 }
 

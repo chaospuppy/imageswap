@@ -31,7 +31,7 @@ func validateCreate() hook.AdmitFunc {
 	}
 }
 
-func mutateCreate(ecrHostname string) hook.AdmitFunc {
+func mutateCreate(hostname string) hook.AdmitFunc {
 	return func(r *v1.AdmissionRequest) (*hook.Result, error) {
 		var operations []hook.PatchOperation
 		pod, err := parsePod(r.Object.Raw)
@@ -39,8 +39,8 @@ func mutateCreate(ecrHostname string) hook.AdmitFunc {
 			return &hook.Result{Msg: err.Error()}, nil
 		}
 
-		operations = append(createPatchOperations(pod.Spec.Containers, operations, ecrHostname, "containers"))
-		operations = append(createPatchOperations(pod.Spec.InitContainers, operations, ecrHostname, "initContainers"))
+		operations = append(createPatchOperations(pod.Spec.Containers, operations, hostname, "containers"))
+		operations = append(createPatchOperations(pod.Spec.InitContainers, operations, hostname, "initContainers"))
 		return &hook.Result{
 			Allowed:  true,
 			PatchOps: operations,
@@ -48,8 +48,8 @@ func mutateCreate(ecrHostname string) hook.AdmitFunc {
 	}
 }
 
-//createPatchOperations ingests a list of core/v1 Containers and replaces their existing images with images whose hostnames are set to the provided ecrHostname
-func createPatchOperations(containers []corev1.Container, operations []hook.PatchOperation, ecrHostname string, containerPath string) []hook.PatchOperation {
+//createPatchOperations ingests a list of core/v1 Containers and replaces their existing images with images whose hostnames are set to the provided hostname
+func createPatchOperations(containers []corev1.Container, operations []hook.PatchOperation, hostname string, containerPath string) []hook.PatchOperation {
 	for i, container := range containers {
 		named, err := reference.ParseNormalizedNamed(container.Image)
 		if err != nil {
@@ -65,7 +65,7 @@ func createPatchOperations(containers []corev1.Container, operations []hook.Patc
 		if tagged, ok := named.(reference.Tagged); ok {
 			tag = ":" + tagged.Tag()
 		}
-		operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/%s/%d/image", containerPath, i), ecrHostname+"/"+reference.Path(named)+tag+digest))
+		operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/%s/%d/image", containerPath, i), hostname+"/"+reference.Path(named)+tag+digest))
 		// Add annotations indicating original image value
 		operations = append(operations, hook.AddPatchOperation(fmt.Sprintf("/metadata/annotations/imageswap.ironbank.dso.mil~1%sOriginalImage", container.Name), container.Image))
 	}
