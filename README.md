@@ -58,8 +58,6 @@ make build-image
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
 <!-- USAGE EXAMPLES -->
 ## Usage
 Please see `Makefile` and `internal/deploy/` for materials used to test the webhook locally using KinD.  The manifests in `internal/deploy/` can be used as a starting place for deploying
@@ -70,16 +68,16 @@ Please see `Makefile` and `internal/deploy/` for materials used to test the webh
 ## Roadmap
 All dates are TBD, this project is passively developed
 
-- [] Makefile test
-  - [] Unit Testing
-- [] Makefile fmt
-- [] Makefile lint
-  - [] golangcli-lint
-- [] Validating webhook
-- [] More complete examples
-- [] CI pipeline
-- [] Serve on 8080 (insecure)
-- [] Helm Chart
+- [ ] Makefile test
+  - [ ] Unit Testing
+- [ ] Makefile fmt
+- [ ] Makefile lint
+  - [ ] golangcli-lint
+- [ ] Validating webhook
+- [ ] More complete examples
+- [ ] CI pipeline
+- [ ] Serve on 8080 (insecure)
+- [ ] Helm Chart
 
 See the [open issues](https://github.com/chaospuppy/imageswap/issues) for a full list of proposed features (and known issues).
 
@@ -101,16 +99,12 @@ Don't forget to give the project a star! Thanks again!
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
 <!-- LICENSE -->
 ## License
 
 Distributed under the Apache 2.0 License. See `LICENSE` for more information.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- CONTACT -->
 ## Contact
