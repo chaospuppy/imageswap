@@ -67,7 +67,7 @@ func createPatchOperations(containers []corev1.Container, operations []hook.Patc
 		}
 		operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/%s/%d/image", containerPath, i), hostname+"/"+reference.Path(named)+tag+digest))
 		// Add annotations indicating original image value
-		operations = append(operations, hook.AddPatchOperation(fmt.Sprintf("/metadata/annotations/imageswap.ironbank.dso.mil~1%d", i), container.Image))
+		operations = append(operations, hook.AddPatchOperation(fmt.Sprintf("/metadata/annotations/imageswap.ironbank.dso.mil~1originalImage%d", i), container.Image))
 	}
 	return operations
 }
