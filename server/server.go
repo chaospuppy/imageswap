@@ -3,7 +3,7 @@ package server
 
 import (
 	"fmt"
-	"imageswap/pods"
+	"github.com/chaospuppy/imageswap/pods"
 	"net/http"
 )
 

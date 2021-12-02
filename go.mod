@@ -1,8 +1,9 @@
-module imageswap
+module github.com/chaospuppy/imageswap
 
 go 1.17
 
 require (
+	github.com/docker/distribution v2.7.1+incompatible
 	github.com/spf13/cobra v1.2.1
 	k8s.io/api v0.22.3
 	k8s.io/apimachinery v0.22.3
@@ -10,7 +11,6 @@ require (
 )
 
 require (
-	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/go-logr/logr v1.2.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/go-cmp v0.5.5 // indirect

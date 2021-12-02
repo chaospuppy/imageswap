@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"imageswap/hook"
+	"github.com/chaospuppy/imageswap/hook"
 
 	_ "crypto/sha256" //Needed in the event the container image contains a digest
 	"github.com/docker/distribution/reference"
