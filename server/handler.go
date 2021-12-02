@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"imageswap/hook"
+	"github.com/chaospuppy/imageswap/hook"
 
 	admission "k8s.io/api/admission/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"

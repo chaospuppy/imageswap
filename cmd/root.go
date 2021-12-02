@@ -17,8 +17,8 @@ package cmd
 
 import (
 	"context"
+	"github.com/chaospuppy/imageswap/server"
 	"github.com/spf13/cobra"
-	"imageswap/server"
 	"k8s.io/klog/v2"
 	"os"
 	"os/signal"

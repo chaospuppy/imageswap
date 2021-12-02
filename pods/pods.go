@@ -3,7 +3,7 @@ package pods
 
 import (
 	"encoding/json"
-	"imageswap/hook"
+	"github.com/chaospuppy/imageswap/hook"
 	v1 "k8s.io/api/core/v1"
 )
 

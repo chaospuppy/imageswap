@@ -16,7 +16,7 @@ limitations under the License.
 package main
 
 import (
-	"imageswap/cmd"
+	"github.com/chaospuppy/imageswap/cmd"
 )
 
 func main() {
