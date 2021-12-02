@@ -3,7 +3,6 @@ package pods
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/chaospuppy/imageswap/hook"
 
@@ -14,23 +13,6 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func validateCreate() hook.AdmitFunc {
-	return func(r *v1.AdmissionRequest) (*hook.Result, error) {
-		pod, err := parsePod(r.Object.Raw)
-		if err != nil {
-			return &hook.Result{Msg: err.Error()}, nil
-		}
-
-		for _, c := range pod.Spec.Containers {
-			if strings.HasSuffix(c.Image, ":latest") {
-				return &hook.Result{Msg: "You cannot use the tag 'latest' in a container."}, nil
-			}
-		}
-
-		return &hook.Result{Allowed: true}, nil
-	}
-}
-
 func mutateCreate(hostname string) hook.AdmitFunc {
 	return func(r *v1.AdmissionRequest) (*hook.Result, error) {
 		var operations []hook.PatchOperation
@@ -39,17 +21,25 @@ func mutateCreate(hostname string) hook.AdmitFunc {
 			return &hook.Result{Msg: err.Error()}, nil
 		}
 
-		annotations := pod.Annotations
-		// Add /metadata/annotations if it doesn't exist
-		if annotations == nil {
-			klog.Info("Adding annotations map")
-			annotations = make(map[string]string)
-			operations = append(operations, hook.AddPatchOperation("/metadata/annotations", annotations))
+		containersList := [][]corev1.Container{
+			pod.Spec.Containers,
+			pod.Spec.InitContainers,
 		}
+
+		var allContainers []corev1.Container
+		for _, s := range containersList {
+			allContainers = append(allContainers, s...)
+		}
+
 		operations = append(createPatchOperations(pod.Spec.Containers, operations, hostname, "containers"))
 		operations = append(createPatchOperations(pod.Spec.InitContainers, operations, hostname, "initContainers"))
-		annotations = createPodAnnotations(pod.Spec.Containers, annotations, "container")
-		annotations = createPodAnnotations(pod.Spec.InitContainers, annotations, "initContainer")
+
+		annotations := pod.Annotations
+		if annotations == nil {
+			annotations = make(map[string]string)
+		}
+
+		annotations = createPodAnnotations(allContainers, annotations)
 		operations = append(operations, hook.AddPatchOperation("/metadata/annotations", annotations))
 
 		return &hook.Result{
@@ -59,9 +49,9 @@ func mutateCreate(hostname string) hook.AdmitFunc {
 	}
 }
 
-func createPodAnnotations(containers []corev1.Container, annotations map[string]string, prefix string) map[string]string {
+func createPodAnnotations(containers []corev1.Container, annotations map[string]string) map[string]string {
 	for i, container := range containers {
-		annotations[fmt.Sprintf("imageswap.ironbank.dso.mil/%s%d", prefix, i)] = container.Image
+		annotations[fmt.Sprintf("imageswap.ironbank.dso.mil/%d", i)] = container.Image
 	}
 	return annotations
 }
