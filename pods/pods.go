@@ -7,13 +7,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-// NewValidationHook creates a new instance of pods validation hook
-func NewValidationHook() hook.Hook {
-	return hook.Hook{
-		Create: validateCreate(),
-	}
-}
-
 // NewMutationHook creates a new instance of pods mutation hook
 func NewMutationHook(hostname string) hook.Hook {
 	return hook.Hook{

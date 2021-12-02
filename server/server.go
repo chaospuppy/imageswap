@@ -19,13 +19,11 @@ func RunHTTPServer(server *http.Server, tlsKey string, tlsCert string) error {
 func NewHTTPServer(port string, hostname string) *http.Server {
 
 	// Instances hooks
-	podsValidation := pods.NewValidationHook()
 	podsMutation := pods.NewMutationHook(hostname)
 
 	ah := newAdmissionHandler()
 	mux := http.NewServeMux()
 	mux.Handle("/healthz", healthz())
-	mux.Handle("/validate/pods", ah.Serve(podsValidation))
 	mux.Handle("/mutate", ah.Serve(podsMutation))
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),

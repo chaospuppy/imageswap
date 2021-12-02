@@ -1,6 +1,8 @@
 apiVersion: v1
 kind: Pod
 metadata:
+  annotations:
+    stupid: annotation
   labels:
     run: alpine
   name: alpine
