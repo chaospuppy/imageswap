@@ -1,4 +1,4 @@
-module imageswap
+module github.com/chaospuppy/imageswap
 
 go 1.17
 
