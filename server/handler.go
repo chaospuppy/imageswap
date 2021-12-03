@@ -98,7 +98,6 @@ func (h *admissionHandler) Serve(hook hook.Hook) http.HandlerFunc {
 			return
 		}
 
-		klog.Infof("res: %+v", admissionReview)
 		klog.Infof("Webhook [%s - %s] - Allowed: %t - PatchOps: %s", r.URL.Path, review.Request.Operation, result.Allowed, result.PatchOps)
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)

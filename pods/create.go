@@ -31,15 +31,20 @@ func mutateCreate(hostname string) hook.AdmitFunc {
 			allContainers = append(allContainers, s...)
 		}
 
-		operations = append(createPatchOperations(pod.Spec.Containers, operations, hostname, "containers"))
-		operations = append(createPatchOperations(pod.Spec.InitContainers, operations, hostname, "initContainers"))
+		for i, container := range pod.Spec.Containers {
+			operations = append(operations, patchContainerImage(container, hostname, false, i))
+		}
+		for i, container := range pod.Spec.InitContainers {
+			operations = append(operations, patchContainerImage(container, hostname, true, i))
+		}
 
 		annotations := pod.Annotations
 		if annotations == nil {
 			annotations = make(map[string]string)
 		}
-
-		annotations = createPodAnnotations(allContainers, annotations)
+		for i, container := range allContainers {
+			annotations[fmt.Sprintf("imageswap.ironbank.dso.mil/%d", i)] = container.Image
+		}
 		operations = append(operations, hook.AddPatchOperation("/metadata/annotations", annotations))
 
 		return &hook.Result{
@@ -49,31 +54,29 @@ func mutateCreate(hostname string) hook.AdmitFunc {
 	}
 }
 
-func createPodAnnotations(containers []corev1.Container, annotations map[string]string) map[string]string {
-	for i, container := range containers {
-		annotations[fmt.Sprintf("imageswap.ironbank.dso.mil/%d", i)] = container.Image
+func patchContainerImage(container corev1.Container, hostname string, isInit bool, index int) hook.PatchOperation {
+	named, err := reference.ParseNormalizedNamed(container.Image)
+	if err != nil {
+		klog.Fatal(err)
 	}
-	return annotations
-}
+	var digest string
+	var tag string
+	// Check for valid digest
+	if digested, ok := named.(reference.Digested); ok {
+		digest = "@" + digested.Digest().String()
+	}
+	// Check for valid tag
+	if tagged, ok := named.(reference.Tagged); ok {
+		tag = ":" + tagged.Tag()
+	}
 
-//createPatchOperations ingests a list of core/v1 Containers and replaces their existing images with images whose hostnames are set to the provided hostname
-func createPatchOperations(containers []corev1.Container, operations []hook.PatchOperation, hostname string, containerPath string) []hook.PatchOperation {
-	for i, container := range containers {
-		named, err := reference.ParseNormalizedNamed(container.Image)
-		if err != nil {
-			klog.Fatal(err)
-		}
-		var digest string
-		var tag string
-		// Check for valid digest
-		if digested, ok := named.(reference.Digested); ok {
-			digest = "@" + digested.Digest().String()
-		}
-		// Check for valid tag
-		if tagged, ok := named.(reference.Tagged); ok {
-			tag = ":" + tagged.Tag()
-		}
-		operations = append(operations, hook.ReplacePatchOperation(fmt.Sprintf("/spec/%s/%d/image", containerPath, i), hostname+"/"+reference.Path(named)+tag+digest))
+	var operation hook.PatchOperation
+
+	if isInit {
+		operation = hook.ReplacePatchOperation(fmt.Sprintf("/spec/initContainers/%d/image", index), hostname+"/"+reference.Path(named)+tag+digest)
+	} else {
+		operation = hook.ReplacePatchOperation(fmt.Sprintf("/spec/containers/%d/image", index), hostname+"/"+reference.Path(named)+tag+digest)
 	}
-	return operations
+
+	return operation
 }
