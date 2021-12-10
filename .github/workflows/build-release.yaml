@@ -1,0 +1,53 @@
+name: build-release
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: build
+        run: make build-linux
+  build-push-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: build-image-tag
+        run: make build-image
+        env:
+          IMAGE_REPO: docker.io/chaospuppy
+          IMAGE_NAME: imageswap
+          IMAGE_TAG: ${{ GITHUB_REF_NAME }}
+        if: ${{ github.ref_type == 'tag' }}
+      - name: build-image-latest
+        run: make build-image
+        env:
+          IMAGE_REPO: docker.io/chaospuppy
+          IMAGE_NAME: imageswap
+          IMAGE_TAG: latest
+        if: ${{ github.ref_type == 'branch' && github.ref_name == 'main' }}
+      - name: docker-login
+        run: echo "${{ secrets.CHAOSPUPPY_DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.CHAOSPUPPY_DOCKERHUB_USERNAME }} --password-stdin
+      - name: push-image
+        run: make push-image
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.WORKFLOW_TOKEN }}"
+          prerelease: false
+          files: |
+            build/_output/linux/bin/imageswap

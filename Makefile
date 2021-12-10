@@ -73,7 +73,7 @@ build:
 	@CGO_ENABLED=0 go build -o build/_output/bin/$(IMAGE_NAME) main.go
 
 build-linux:
-	@echo "Building the $(IMAGE_NAME) binary for Docker (linux)..."
+	@echo "Building the $(IMAGE_NAME) binary for linux..."
 	@GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/_output/linux/bin/$(IMAGE_NAME) main.go
 
 ############################################################

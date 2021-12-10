@@ -1,4 +1,4 @@
-name: pr-fmt-lint-test
+name: fmt-lint-test
 on:
   push:
     tags:
