@@ -25,7 +25,7 @@ jobs:
         with:
           go-version: 1.17
       - name: build-image-tag
-        run: IMAGE_REPO='docker.io/chaospuppy' IMAGE_NAME='imageswap' IMAGE_TAG=${{ env.GITHUB_REF_NAME }} make build-image
+        run: IMAGE_REPO='docker.io/chaospuppy' IMAGE_NAME='imageswap' IMAGE_TAG=$GITHUB_REF_NAME make build-image
         if: ${{ github.ref_type == 'tag' }}
       - name: build-image-latest
         run: IMAGE_REPO='docker.io/chaospuppy' IMAGE_NAME='imageswap' IMAGE_TAG=latest make build-image
@@ -33,7 +33,7 @@ jobs:
       - name: docker-login
         run: echo "${{ secrets.CHAOSPUPPY_DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.CHAOSPUPPY_DOCKERHUB_USERNAME }} --password-stdin
       - name: push-image-tag
-        run: IMAGE_REPO='docker.io/chaospuppy' IMAGE_NAME='imageswap' IMAGE_TAG=${{ env.GITHUB_REF_NAME }} make push-image
+        run: IMAGE_REPO='docker.io/chaospuppy' IMAGE_NAME='imageswap' IMAGE_TAG=$GITHUB_REF_NAME make push-image
         if: ${{ github.ref_type == 'tag' }}
       - name: push-image-latest
         run: IMAGE_REPO='docker.io/chaospuppy' IMAGE_NAME='imageswap' IMAGE_TAG=latest make push-image
