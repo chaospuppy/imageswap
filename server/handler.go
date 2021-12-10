@@ -35,12 +35,12 @@ func (h *admissionHandler) Serve(hook hook.Hook) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		if r.Method != http.MethodPost {
-			http.Error(w, fmt.Sprint("invalid method only POST requests are allowed"), http.StatusMethodNotAllowed)
+			http.Error(w, "invalid method only POST requests are allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
 		if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
-			http.Error(w, fmt.Sprint("only content type 'application/json' is supported"), http.StatusBadRequest)
+			http.Error(w, "only content type 'application/json' is supported", http.StatusBadRequest)
 			return
 		}
 
@@ -100,13 +100,19 @@ func (h *admissionHandler) Serve(hook hook.Hook) http.HandlerFunc {
 
 		klog.Infof("Webhook [%s - %s] - Allowed: %t - PatchOps: %s", r.URL.Path, review.Request.Operation, result.Allowed, result.PatchOps)
 		w.WriteHeader(http.StatusOK)
-		w.Write(res)
+		_, err = w.Write(res)
+		if err != nil {
+			klog.Error(err)
+		}
 	}
 }
 
 func healthz() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("ok"))
+		_, err := w.Write([]byte("ok"))
+		if err != nil {
+			klog.Error(err)
+		}
 	}
 }
