@@ -32,12 +32,17 @@ jobs:
         if: ${{ github.ref_type == 'branch' && github.ref_name == 'main' }}
       - name: docker-login
         run: echo "${{ secrets.CHAOSPUPPY_DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.CHAOSPUPPY_DOCKERHUB_USERNAME }} --password-stdin
-      - name: push-image
-        run: make push-image
+      - name: push-image-tag
+        run: IMAGE_REPO='docker.io/chaospuppy' IMAGE_NAME='imageswap' IMAGE_TAG=${{ env.GITHUB_REF_NAME }} make push-image
+        if: ${{ github.ref_type == 'tag' }}
+      - name: push-image-latest
+        run: IMAGE_REPO='docker.io/chaospuppy' IMAGE_NAME='imageswap' IMAGE_TAG=latest make push-image
+        if: ${{ github.ref_type == 'branch' && github.ref_name == 'main' }}
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: create-release
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.WORKFLOW_TOKEN }}"
           prerelease: false
