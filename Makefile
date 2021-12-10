@@ -39,7 +39,7 @@ endif
 
 fmt:
 	@echo "Run go fmt..."
-	#TODO
+	@go fmt $(PWD)
 
 ############################################################
 # lint section
@@ -47,7 +47,7 @@ fmt:
 
 lint:
 	@echo "Runing the golangci-lint..."
-	#TODO
+	@golangci-lint run ./...
 
 ############################################################
 # test section
@@ -55,8 +55,7 @@ lint:
 
 test:
 	@echo "Running the tests for $(IMAGE_NAME)..."
-	#TODO write some tests
-	# @go test $(TESTARGS) ./...
+	@go test $(TESTARGS) ./...
 
 test-deployment: image
 	@echo "Deploying webhook and webhook configuration on local kind cluster"
