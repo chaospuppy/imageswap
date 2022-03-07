@@ -55,7 +55,6 @@ func (kpr *keypairReloader) maybeReload() error {
 
 func (kpr *keypairReloader) GetCertificateFunc() func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
 	return func(clientHello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-		klog.Info("Received ClientHello!")
 		kpr.certMu.RLock()
 		defer kpr.certMu.RUnlock()
 		return kpr.cert, nil
