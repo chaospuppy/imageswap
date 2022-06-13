@@ -1,7 +1,7 @@
-IMAGE_REPO ?= localhost:5000/ironbank/imageswap
+IMAGE_REPO ?= localhost:5000/imageswap
 IMAGE_NAME ?= imageswap
 
-GIT_HOST =? repo1.dso.mil/platform-one-private/bigbang/ironbank/
+GIT_HOST =? github.com
 
 PWD := $(shell pwd)
 BASE_DIR := $(shell basename $(PWD))

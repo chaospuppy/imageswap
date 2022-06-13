@@ -1,10 +1,11 @@
 package pods
 
 import (
-	"github.com/chaospuppy/imageswap/hook"
+	"testing"
+
+	"github.com/chaospuppy/imageswap/pkg/hook"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
-	"testing"
 )
 
 const expectedRegistry = "expected.registry"

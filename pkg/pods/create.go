@@ -4,16 +4,17 @@ package pods
 import (
 	"fmt"
 
-	"github.com/chaospuppy/imageswap/hook"
+	"github.com/chaospuppy/imageswap/pkg/hook"
 
 	_ "crypto/sha256" //Needed in the event the container image contains a digest
+
 	"github.com/docker/distribution/reference"
-	"k8s.io/api/admission/v1"
+	v1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
 )
 
-func mutateCreate(hostname string) hook.AdmitFunc {
+func mutateCreate(hostname string, annotation string) hook.AdmitFunc {
 	return func(r *v1.AdmissionRequest) (*hook.Result, error) {
 		var operations []hook.PatchOperation
 		pod, err := parsePod(r.Object.Raw)
@@ -43,7 +44,7 @@ func mutateCreate(hostname string) hook.AdmitFunc {
 			annotations = make(map[string]string)
 		}
 		for i, container := range allContainers {
-			annotations[fmt.Sprintf("imageswap.ironbank.dso.mil/%d", i)] = container.Image
+			annotations[fmt.Sprintf("%s/%d", annotation, i)] = container.Image
 		}
 		operations = append(operations, hook.AddPatchOperation("/metadata/annotations", annotations))
 

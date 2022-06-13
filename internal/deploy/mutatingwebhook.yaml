@@ -5,7 +5,7 @@ metadata:
   labels:
     app: imageswap
 webhooks:
-- name: imageswap.ironbank.dso.mil
+- name: imageswap.chaospuppy.github.com
   clientConfig:
     service:
       name: imageswap
@@ -20,13 +20,13 @@ webhooks:
   sideEffects: None
   objectSelector:
     matchExpressions:
-      - key: imageswap.ironbank.dso.mil
+      - key: imageswap.chaospuppy.github.com
         values:
           - "disabled"
         operator: NotIn
   namespaceSelector:
     matchExpressions:
-      - key: imageswap.ironbank.dso.mil
+      - key: imageswap.chaospuppy.github.com
         values:
           - "disabled"
         operator: NotIn

@@ -3,4 +3,4 @@ kind: Namespace
 metadata:
   name: imageswap
   labels:
-    imageswap.ironbank.dso.mil: "disabled"
+    imageswap.chaospuppy.github.com: "disabled"

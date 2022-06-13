@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/chaospuppy/imageswap/hook"
+	"github.com/chaospuppy/imageswap/pkg/hook"
 
 	admission "k8s.io/api/admission/v1"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,7 +24,7 @@ type admissionHandler struct {
 }
 
 // newAdmissionHandler returns an instance of AdmissionHandler
-func newAdmissionHandler() *admissionHandler {
+func NewAdmissionHandler() *admissionHandler {
 	return &admissionHandler{
 		decoder: serializer.NewCodecFactory(runtime.NewScheme()).UniversalDeserializer(),
 	}
@@ -107,7 +107,7 @@ func (h *admissionHandler) Serve(hook hook.Hook) http.HandlerFunc {
 	}
 }
 
-func healthz() http.HandlerFunc {
+func Healthz() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, err := w.Write([]byte("ok"))

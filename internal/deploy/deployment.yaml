@@ -5,7 +5,7 @@ metadata:
   namespace: imageswap
   labels:
     app: imageswap
-    imageswap.ironbank.dso.mil: "disabled"
+    imageswap.chaospuppy.github.com: "disabled"
 spec:
   replicas: 1
   selector:
@@ -15,15 +15,15 @@ spec:
     metadata:
       labels:
         app: imageswap
-        imageswap.ironbank.dso.mil: "disabled"
+        imageswap.chaospuppy.github.com: "disabled"
     spec:
       containers:
         - name: imageswap
-          image: localhost:5000/ironbank/imageswap/imageswap:latest
+          image: localhost:5000/imageswap/imageswap:latest
           imagePullPolicy: Always
           args:
             - "/imageswap"
-            - "$(ECR_HOSTNAME)"
+            - --registry-hostname="$(ECR_HOSTNAME)"
             # - --tls-cert-file=/etc/webhook/certs/cert.pem
             # - --tls-cert-key=/etc/webhook/certs/key.pem
           volumeMounts:

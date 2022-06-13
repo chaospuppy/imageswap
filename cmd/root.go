@@ -17,17 +17,17 @@ package cmd
 
 import (
 	"context"
-	"github.com/chaospuppy/imageswap/server"
-	"github.com/spf13/cobra"
-	"k8s.io/klog/v2"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/chaospuppy/imageswap/pkg/imageswap"
+	"github.com/chaospuppy/imageswap/pkg/server"
+	"github.com/spf13/cobra"
+	"k8s.io/klog/v2"
 )
 
-var (
-	tlsKey, tlsCert, httpPort string
-)
+var is imageswap.Imageswap
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -42,8 +42,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		// TODO run additional validation on provided hostname to ensure it matches a registry regex
-		registryHostname := args[0]
-		svr := server.NewHTTPServer(httpPort, registryHostname, tlsCert, tlsKey)
+		svr := is.NewHTTPServer()
 
 		idleConnsClosed := make(chan struct{})
 		go func() {
@@ -61,7 +60,7 @@ var rootCmd = &cobra.Command{
 		}()
 
 		server.RunHTTPServer(svr)
-		klog.Infof("Server listening on port: %v", httpPort)
+		klog.Infof("Server listening on port: %v", is.HttpPort)
 		<-idleConnsClosed
 	},
 }
@@ -73,7 +72,9 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&httpPort, "httpPort", "8443", "The port the webhook HTTP Server with listen on.  Defaults to 8443")
-	rootCmd.PersistentFlags().StringVar(&tlsKey, "tlsKeyFile", "/etc/webhook/certs/key.pem", "Path to TLS key")
-	rootCmd.PersistentFlags().StringVar(&tlsCert, "tlsCertFile", "/etc/webhook/certs/cert.pem", "Path to TLS certificate")
+	rootCmd.PersistentFlags().StringVar(&is.HttpPort, "httpPort", "8443", "The port the webhook HTTP Server with listen on.  Defaults to 8443")
+	rootCmd.PersistentFlags().StringVar(&is.TlsKey, "tlsKeyFile", "/etc/webhook/certs/key.pem", "Path to TLS key")
+	rootCmd.PersistentFlags().StringVar(&is.TlsCert, "tlsCertFile", "/etc/webhook/certs/cert.pem", "Path to TLS certificate")
+	rootCmd.PersistentFlags().StringVar(&is.Annotation, "imageswapAnnotation", "imageswap.chaospuppy.github.com", "Annotation key for imageswap to monitor")
+	rootCmd.PersistentFlags().StringVar(&is.RegistryHostname, "registryHostname", "", "registry fqdn to replace original registry with")
 }

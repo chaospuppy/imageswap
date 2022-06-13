@@ -3,14 +3,15 @@ package pods
 
 import (
 	"encoding/json"
-	"github.com/chaospuppy/imageswap/hook"
+
+	"github.com/chaospuppy/imageswap/pkg/hook"
 	v1 "k8s.io/api/core/v1"
 )
 
 // NewMutationHook creates a new instance of pods mutation hook
-func NewMutationHook(hostname string) hook.Hook {
+func NewMutationHook(hostname string, annotation string) hook.Hook {
 	return hook.Hook{
-		Create: mutateCreate(hostname),
+		Create: mutateCreate(hostname, annotation),
 	}
 }
 

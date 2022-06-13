@@ -83,7 +83,7 @@ kind: Pod
 metadata:
   labels:
     run: alpine
-    imageswap.ironbank.dso.mil: disabled
+    imageswap.chaospuppy.github.com: disabled
   name: alpine-ignored
   namespace: default
 spec:
